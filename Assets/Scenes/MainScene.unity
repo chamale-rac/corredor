@@ -1664,7 +1664,7 @@ MonoBehaviour:
   - {fileID: 1879777515}
   - {fileID: 446638016}
   narrativeManager: {fileID: 1591316945}
-  audioSource: {fileID: 0}
+  audioSource: {fileID: 505528046}
 --- !u!1 &441934572
 GameObject:
   m_ObjectHideFlags: 0
@@ -2265,6 +2265,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 646743990}
+  - component: {fileID: 646743991}
   m_Layer: 0
   m_Name: Scenario
   m_TagString: Untagged
@@ -2288,6 +2289,23 @@ Transform:
   - {fileID: 1888552790}
   m_Father: {fileID: 1507466929}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &646743991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 646743989}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7622ee4e54483e840891344356e3ddec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetObject: {fileID: 1194515770}
+  followX: 0
+  followY: 1
+  followZ: 1
+  showDebugInfo: 0
 --- !u!1 &721914241
 GameObject:
   m_ObjectHideFlags: 0
@@ -3137,7 +3155,7 @@ AudioSource:
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -3344,6 +3362,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1165778741}
   m_CullTransparentMesh: 1
+--- !u!1 &1194515770 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5393215578589016642, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
+  m_PrefabInstance: {fileID: 1215110508}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1215110508
 PrefabInstance:
   m_ObjectHideFlags: 0
