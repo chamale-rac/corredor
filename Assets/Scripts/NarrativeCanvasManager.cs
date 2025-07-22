@@ -52,6 +52,10 @@ public class NarrativeCanvasManager : MonoBehaviour
                 topPanelGroup = topPanel.gameObject.AddComponent<CanvasGroup>();
                 Debug.Log("Added CanvasGroup to top panel");
             }
+            // Set initial opacity to 0
+            topPanelGroup.alpha = 0f;
+            topPanelGroup.interactable = false;
+            topPanelGroup.blocksRaycasts = false;
         }
         
         if (bottomPanel != null)
@@ -62,6 +66,17 @@ public class NarrativeCanvasManager : MonoBehaviour
                 bottomPanelGroup = bottomPanel.gameObject.AddComponent<CanvasGroup>();
                 Debug.Log("Added CanvasGroup to bottom panel");
             }
+            // Set initial opacity to 0
+            bottomPanelGroup.alpha = 0f;
+            bottomPanelGroup.interactable = false;
+            bottomPanelGroup.blocksRaycasts = false;
+        }
+        
+        // Set narrative text to empty and invisible at start
+        if (narrativeText != null)
+        {
+            narrativeText.text = "";
+            narrativeText.alpha = 0f;
         }
     }
 
@@ -71,6 +86,7 @@ public class NarrativeCanvasManager : MonoBehaviour
     /// <param name="texts">Array of texts to display in sequence.</param>
     /// <param name="textTransitions">Array of transitions for each text: "write", "fade", "instant".</param>
     /// <param name="panelTransitions">Array of panel transitions: "fade", "instant". [in, out]</param>
+    /// <param name="displayTimes">Array of times (in seconds) to wait after each text appears. Use -1f for default.</param>
     public void StartTextRoutine(string[] texts, string[] textTransitions, string[] panelTransitions)
     {
         Debug.Log("StartTextRoutine called with " + texts.Length + " texts");
@@ -88,10 +104,29 @@ public class NarrativeCanvasManager : MonoBehaviour
             StopCoroutine(routine);
         }
         
-        routine = StartCoroutine(TextRoutine(texts, textTransitions, panelTransitions));
+        routine = StartCoroutine(TextRoutine(texts, textTransitions, panelTransitions, null));
     }
 
-    private IEnumerator TextRoutine(string[] texts, string[] textTransitions, string[] panelTransitions)
+    /// <summary>
+    /// Overload to support displayTimes parameter.
+    /// </summary>
+    public void StartTextRoutine(string[] texts, string[] textTransitions, string[] panelTransitions, float[] displayTimes)
+    {
+        Debug.Log("StartTextRoutine (with displayTimes) called with " + texts.Length + " texts");
+        if (topPanelGroup == null || bottomPanelGroup == null || narrativeText == null)
+        {
+            Debug.LogError("Missing UI references! Cannot start text routine.");
+            return;
+        }
+        if (routine != null)
+        {
+            Debug.Log("Stopping existing routine");
+            StopCoroutine(routine);
+        }
+        routine = StartCoroutine(TextRoutine(texts, textTransitions, panelTransitions, displayTimes));
+    }
+
+    private IEnumerator TextRoutine(string[] texts, string[] textTransitions, string[] panelTransitions, float[] displayTimes)
     {
         Debug.Log("TextRoutine started");
         
@@ -117,8 +152,13 @@ public class NarrativeCanvasManager : MonoBehaviour
             Debug.Log($"Displaying text {i+1}: '{texts[i]}' with transition: {transition}");
             yield return TextTransition(texts[i], transition);
             
-            // Optional: Add a small delay between texts
-            yield return new WaitForSeconds(1f);
+            // Wait for the specified display time, or default to 1f if not provided or -1f
+            float waitTime = 1f;
+            if (displayTimes != null && displayTimes.Length > i && displayTimes[i] >= 0f)
+            {
+                waitTime = displayTimes[i];
+            }
+            yield return new WaitForSeconds(waitTime);
         }
 
         // After the last text animation, clear the text
