@@ -118,7 +118,7 @@ public class DraggableCube : MonoBehaviour
         
         // Reset Rigidbody
         cubeRigidbody.useGravity = false;
-        cubeRigidbody.velocity = Vector3.zero;
+        cubeRigidbody.linearVelocity = Vector3.zero;
         cubeRigidbody.angularVelocity = Vector3.zero;
     }
 } 
