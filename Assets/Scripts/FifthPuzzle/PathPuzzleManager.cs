@@ -76,6 +76,31 @@ public class PathPuzzleManager : MonoBehaviour
             platform.transform.SetParent(transform);
             platform.transform.position = position;
             platform.transform.localScale = new Vector3(platformSize, platformHeight, platformSize);
+            
+            // Create and assign a material to prevent purple rendering
+            Renderer renderer = platform.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                Material material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                if (material != null)
+                {
+                    // Set default material properties
+                    material.color = defaultColor;
+                    material.SetFloat("_Smoothness", 0.1f);
+                    material.SetFloat("_Metallic", 0.0f);
+                    renderer.material = material;
+                }
+                else
+                {
+                    // Fallback to standard shader if URP shader not found
+                    Material fallbackMaterial = new Material(Shader.Find("Standard"));
+                    if (fallbackMaterial != null)
+                    {
+                        fallbackMaterial.color = defaultColor;
+                        renderer.material = fallbackMaterial;
+                    }
+                }
+            }
         }
         
         // Add platform script
