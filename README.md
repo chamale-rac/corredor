@@ -1,4 +1,4 @@
-# Corridor of Aesthetic Philosophy
+# Corridor
 
 A simple first-person puzzle game exploring art through five basic interactive challenges.
 
