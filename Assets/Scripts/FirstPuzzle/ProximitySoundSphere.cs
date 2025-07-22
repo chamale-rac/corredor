@@ -25,8 +25,8 @@ public class ProximitySoundSphere : MonoBehaviour
         if (isSingingSphere)
         {
             isFound = true;
-            if (audioSource != null)
-                audioSource.Play();
+            // if (audioSource != null)
+            //     audioSource.Play();
 
             var renderer = GetComponent<Renderer>();
             if (renderer != null)

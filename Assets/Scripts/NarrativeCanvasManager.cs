@@ -12,6 +12,9 @@ public class NarrativeCanvasManager : MonoBehaviour
     public TMP_Text narrativeText;
     public Canvas narrativeCanvas;
     public bool autoToggleCanvas = true;
+    
+    [Header("Additional Panels to Disable")]
+    public GameObject[] panelsToDisable; // Additional panels to disable during text display
 
     [Header("Transition Settings")]
     public float panelFadeDuration = 0.5f;
@@ -123,12 +126,34 @@ public class NarrativeCanvasManager : MonoBehaviour
             Debug.Log("Stopping existing routine");
             StopCoroutine(routine);
         }
-        routine = StartCoroutine(TextRoutine(texts, textTransitions, panelTransitions, displayTimes));
+        routine = StartCoroutine(TextRoutine(texts, textTransitions, panelTransitions, displayTimes, false));
+    }
+    
+    /// <summary>
+    /// Overload to support displayTimes parameter and noFadeOut flag for final text.
+    /// </summary>
+    public void StartTextRoutine(string[] texts, string[] textTransitions, string[] panelTransitions, float[] displayTimes, bool noFadeOut)
+    {
+        Debug.Log("StartTextRoutine (with displayTimes and noFadeOut) called with " + texts.Length + " texts, noFadeOut: " + noFadeOut);
+        if (topPanelGroup == null || bottomPanelGroup == null || narrativeText == null)
+        {
+            Debug.LogError("Missing UI references! Cannot start text routine.");
+            return;
+        }
+        if (routine != null)
+        {
+            Debug.Log("Stopping existing routine");
+            StopCoroutine(routine);
+        }
+        routine = StartCoroutine(TextRoutine(texts, textTransitions, panelTransitions, displayTimes, noFadeOut));
     }
 
-    private IEnumerator TextRoutine(string[] texts, string[] textTransitions, string[] panelTransitions, float[] displayTimes)
+    private IEnumerator TextRoutine(string[] texts, string[] textTransitions, string[] panelTransitions, float[] displayTimes, bool noFadeOut = false)
     {
         Debug.Log("TextRoutine started");
+        
+        // Disable additional panels
+        DisableAdditionalPanels();
         
         // ENABLE CANVAS HERE
         if (autoToggleCanvas && narrativeCanvas != null)
@@ -164,15 +189,26 @@ public class NarrativeCanvasManager : MonoBehaviour
         // After the last text animation, clear the text
         narrativeText.text = "";
 
-        // Panel fade out
-        string panelOutTransition = panelTransitions.Length > 1 ? panelTransitions[1] : "fade";
-        Debug.Log("Panel fade out with transition: " + panelOutTransition);
-        yield return PanelTransition(panelOutTransition, false);
-
-        if (autoToggleCanvas && narrativeCanvas != null)
+        // Panel fade out (skip if noFadeOut is true)
+        if (!noFadeOut)
         {
-            Debug.Log("Disabling canvas");
-            // narrativeCanvas.enabled = false;
+            string panelOutTransition = panelTransitions.Length > 1 ? panelTransitions[1] : "fade";
+            Debug.Log("Panel fade out with transition: " + panelOutTransition);
+            yield return PanelTransition(panelOutTransition, false);
+
+            if (autoToggleCanvas && narrativeCanvas != null)
+            {
+                Debug.Log("Disabling canvas");
+                // narrativeCanvas.enabled = false;
+            }
+            
+            // Re-enable additional panels
+            EnableAdditionalPanels();
+        }
+        else
+        {
+            Debug.Log("Skipping panel fade out (noFadeOut = true)");
+            // Note: Additional panels remain disabled when noFadeOut is true
         }
         
         Debug.Log("TextRoutine completed");
@@ -280,5 +316,35 @@ public class NarrativeCanvasManager : MonoBehaviour
         }
         narrativeText.alpha = targetAlpha;
         Debug.Log($"Text fade completed, final alpha: {targetAlpha}");
+    }
+    
+    private void DisableAdditionalPanels()
+    {
+        if (panelsToDisable != null)
+        {
+            foreach (GameObject panel in panelsToDisable)
+            {
+                if (panel != null)
+                {
+                    panel.SetActive(false);
+                    Debug.Log($"Disabled additional panel: {panel.name}");
+                }
+            }
+        }
+    }
+    
+    private void EnableAdditionalPanels()
+    {
+        if (panelsToDisable != null)
+        {
+            foreach (GameObject panel in panelsToDisable)
+            {
+                if (panel != null)
+                {
+                    panel.SetActive(true);
+                    Debug.Log($"Enabled additional panel: {panel.name}");
+                }
+            }
+        }
     }
 }
